@@ -4,7 +4,7 @@ CC = g++
 LEVEL ?= 3
 DEBUG ?= -DNDEBUG
 WARNINGS ?= -Wall -Werror -Wpedantic -Wunused-result -D_FORTIFY_SOURCE=2
-CFLAGS ?= -std=gnu++98 $(WARNINGS) $(DEBUG) -O$(LEVEL)
+CFLAGS ?= -std=gnu++20 $(WARNINGS) $(DEBUG) -O$(LEVEL)
 
 # SOURCE
 SRC := mobile.cpp
