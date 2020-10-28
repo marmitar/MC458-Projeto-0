@@ -1,13 +1,13 @@
 # TOOLS
-CC ?= gcc
+CC = g++
 # OPTIONS
 LEVEL ?= 3
 DEBUG ?= -DNDEBUG
 WARNINGS ?= -Wall -Werror -Wpedantic -Wunused-result -D_FORTIFY_SOURCE=2
-CFLAGS ?= -std=gnu99 $(WARNINGS) $(DEBUG) -O$(LEVEL)
+CFLAGS ?= -std=gnu++98 $(WARNINGS) $(DEBUG) -O$(LEVEL)
 
 # SOURCE
-SRC := mobile.c
+SRC := mobile.cpp
 # ARTIFACT
 PROG := main
 PROJ := 0
@@ -31,8 +31,8 @@ clean:
 	rm -rf *.o $(PROG) *.zip
 
 # BUILDING
-$(PROG): $(SRC:.c=.o)
+$(PROG): $(SRC:.cpp=.o)
 	$(CC) $(CFLAGS) $^ -o $@
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
