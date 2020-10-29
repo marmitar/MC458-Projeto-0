@@ -1,16 +1,15 @@
 # TOOLS
-CC = g++
+CC ?= gcc
 # OPTIONS
 LEVEL ?= 3
-DEBUG ?= -DNDEBUG
-WARNINGS ?= -Wall -Werror -Wpedantic -Wunused-result -D_FORTIFY_SOURCE=2
-CFLAGS ?= -std=gnu++20 $(WARNINGS) $(DEBUG) -O$(LEVEL)
+DEBUG ?= -DNDEBUG -D_FORTIFY_SOURCE=2
+WARNINGS ?= -Wall -Werror -Wpedantic -Wunused-result
+CFLAGS ?= -std=gnu11 $(WARNINGS) $(DEBUG) -O$(LEVEL)
 
 # SOURCE
-SRC := mobile.cpp
+SRC := mobile.c
 # ARTIFACT
 PROG := main
-PROJ := 0
 
 # GENERAL COMMANDS
 .PHONY: all run clean debug zip
@@ -19,8 +18,6 @@ all: $(PROG)
 
 run: $(PROG)
 	./$(PROG)
-
-zip: $(PROJ).zip
 
 debug: LEVEL = 0
 debug: DEBUG = -DDEBUG
@@ -31,8 +28,8 @@ clean:
 	rm -rf *.o $(PROG) *.zip
 
 # BUILDING
-$(PROG): $(SRC:.cpp=.o)
+$(PROG): $(SRC:.c=.o)
 	$(CC) $(CFLAGS) $^ -o $@
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
