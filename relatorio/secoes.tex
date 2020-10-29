@@ -1,0 +1,69 @@
+\makeatletter
+
+\usepackage{nameref, titlesec}
+\usepackage[hidelinks]{hyperref}
+
+
+% formatação das seções
+\titleformat{\section}[runin]
+    {\titlerule{}\vspace{1ex}\normalfont\Large\bfseries}{}{1em}{}[.]
+\titleformat{\subsection}[runin]
+    {\normalfont\large\bfseries}{}{1em}{}[)]
+
+% marcadores de nome na seção
+\newcommand{\cur@section}{ERRO}
+\newcommand{\cur@subsection}{ERRO}
+
+% seções que atualizam esses marcadores
+\let\old@section\section
+\renewcommand{\section}[1]{%
+    \renewcommand{\cur@section}{#1}%
+    \renewcommand{\cur@subsection}{}%
+    \old@section{#1}%
+}
+\renewcommand{\appendix}[1]{%
+    \renewcommand{\cur@section}{#1}%
+    \renewcommand{\cur@subsection}{}%
+    \old@section{Apêndice #1}%
+}
+\let\old@subsection\subsection
+\renewcommand{\subsection}[1]{%
+    \renewcommand{\cur@subsection}{.\uppercase{#1}}%
+    \old@subsection{#1}%
+}
+
+% nome com seção e subseção
+\newcommand{\cur@itemname}{\cur@section\cur@subsection}
+
+% comandos de referenciar
+\newcommand{\new@ref}[3]{
+    \newcommand{#1}[2][]{%
+        \ifstrempty{##1}{%
+            \hyperref[{##2}]{#2{##2}#3}%
+        }{%
+            \hyperref[{##1}]{#2{##2}#3}%
+        }%
+    }
+}
+\new@ref{\boldref}{\textbf}{}
+% \new@ref{\thmref}{\bfseries\ref*}{}
+\newcommand{\thmref}[2][]{\hyperref[#2]{\bfseries{}#1\ref*{#2}}}
+\new@ref{\itemref}{\bfseries\nameref*}{)}
+\new@ref{\qref}{\bfseries\nameref*}{.}
+
+% linha final da página ou seção
+\newcommand{\docline}[1][\\]{%
+    #1\noindent\rule{\textwidth}{0.4pt}%
+    \pagebreak%
+}
+
+% pula uma linha
+\def\skipline{\vskip\baselineskip}
+
+% linha horizontal menor
+\def\itemsep{
+    \noindent\hfil\rule{0.5\textwidth}{.2pt}\hfil
+    \vskip1em
+}
+
+\makeatother

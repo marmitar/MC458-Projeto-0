@@ -1,0 +1,91 @@
+\makeatletter
+
+\usepackage{amsthm, amsmath, amssymb, bm, mathtools}
+\usepackage{enumitem, etoolbox, xpatch}
+
+
+% tira o ponto do nome do teorema
+\AtBeginDocument{\xpatchcmd{\@thm}{\thm@headpunct{.}}{\thm@headpunct{}}{}{}}
+
+% teoremas mais simples
+% \newtheorem*{ntheorem}{Teorema.}
+\newtheorem*{intheorem}{Teorema Incorreto.}
+\newtheorem*{ptheorem}{Teorema?}
+
+
+% faz label com nome quando não está vazio
+\newcommand{\set@label}[2]{
+    \ifstrempty{#1}{}{%
+        \begingroup%
+            \edef\@currentlabel{#2}%
+            \label{#1}%
+        \endgroup%
+    }
+}
+
+% prova por casos
+\newcounter{cases@cnt}
+\newtheoremstyle{case}{0.2em}{0.2em}{}{\parindent}{\itshape}{.}{0.8em}{\thmname{#1}\thmnumber{ #2}\thmnote{: ~#3~}}
+\theoremstyle{case}
+\newtheorem{case}[cases@cnt]{Caso}
+\def\resetCasos{\setcounter{cases@cnt}{0}}
+
+% ambiente base dos teoremas
+\newtheoremstyle{theorem@sty}{0.2em}{0.2em}{\itshape}{}{\bfseries}{:}{0.8em}{\thmname{#1}\thmnote{ #3}\thmnumber{.#2}}
+\theoremstyle{theorem@sty}
+\newtheorem*{theorem@thm}{Teorema}
+
+% contador dos teoremas
+\newcounter{theorem@cnt}[subsection]
+
+% ambientes dos teoremas
+\newenvironment{theorem}[1][]{%
+    \resetCasos%
+    \refstepcounter{theorem@cnt}%
+    \edef\tmp@val{\thetheorem@cnt}%
+    \begin{theorem@thm}[\cur@itemname.\tmp@val]%
+        \set@label{#1}{\cur@itemname.\tmp@val}%
+}{%
+    \end{theorem@thm}%
+}
+\newenvironment{theorem*}[1][]{%
+    \resetCasos%
+    \begin{theorem@thm}[\cur@itemname]%
+        \set@label{#1}{\cur@itemname}%
+}{%
+    \end{theorem@thm}%
+}
+
+% teorema nomeado
+\newenvironment{ntheorem}[2][]{%
+    \resetCasos%
+    \begin{theorem@thm}[#2]%
+        \set@label{#1}{#1}%
+}{%
+    \end{theorem@thm}%
+}
+
+% ambiente para lemas
+\newtheorem*{theorem@lemma}{Lema}
+\newenvironment{lemma}[1][]{%
+    \resetCasos%
+    \refstepcounter{theorem@cnt}%
+    \edef\tmp@val{\thetheorem@cnt}%
+    \begin{theorem@lemma}[\cur@itemname.\tmp@val]%
+        \set@label{#1}{\cur@itemname.\tmp@val}%
+}{%
+    \end{theorem@lemma}%
+}
+
+% comentários
+\newenvironment{comments}[1][Comentários]{%
+    \begin{proof}[#1]%
+        \edef\qedsymbol{}%
+}{%
+    \end{proof}%
+}
+
+% objetivo do bloco da prova
+\newcommand{\objetivo}[1]{$\left(\text{\textit{#1}}\right)$}
+
+\makeatother

@@ -1,0 +1,44 @@
+\documentclass[a4paper, 14pt]{extarticle}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.2cm]{geometry}
+
+\usepackage{float, pgf, caption, subcaption}
+
+\input{secoes}
+\input{teorema}
+\input{simbolos}
+
+% math display skip
+\newcommand{\reducemathskip}[1][0.5em]{%
+    \setlength{\abovedisplayskip}{1pt}%
+    \setlength{\belowdisplayskip}{#1}%
+    \setlength{\abovedisplayshortskip}{#1}%
+    \setlength{\belowdisplayshortskip}{#1}%
+}
+
+% url linking problems
+\def\url#1{\href{#1}{\texttt{#1}}}
+% vermelho
+\def\red#1{\textcolor{red}{#1}}
+
+\def\lmref#1{\thmref[lema ]{#1}}
+
+\usepackage{xparse}
+
+\NewDocumentCommand{\seq}{ s m O{n} O{\in\natural} }
+    {\IfBooleanTF{#1}
+        {\ensuremath{\left({#2}_{#3}\right)}}
+        {\ensuremath{\left({#2}_{#3}\right)_{{#3}{#4}}}}}
+
+
+\title{\vspace{-2.5cm}Projeto de Algoritmo com Implementação nº 0 \\ \normalsize MC458 - 2s2020}
+\author{Tiago de Paula Alves \\ \small 187679}
+\date{}
+
+\begin{document}
+    \maketitle
+
+\end{document}

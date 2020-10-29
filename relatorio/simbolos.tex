@@ -1,0 +1,105 @@
+\makeatletter
+
+\usepackage{amsthm, amsmath, amssymb, bm, mathtools}
+% \usepackage[mathcal]{euscript}
+% \usepackage[scr]{rsfso}
+\usepackage{mathptmx}
+\usepackage{relsize, centernot, tikz, xcolor}
+
+
+%%%% QED symbols %%%%
+\def\qed@open{\ensuremath{\square}}
+\def\qed@open@small{\ensuremath{\mathsmaller\qed@open}}
+
+\def\qed@fill{\ensuremath{\blacksquare}}
+\def\qed@fill@small{\ensuremath{\mathsmaller\qed@fill}}
+
+\definecolor{qed@gray}{gray}{0.8}
+\def\qed@gray{\ensuremath{\color{qed@gray}\blacksquare}}
+\def\qed@gray@small{\ensuremath{\color{qed@gray}\mathsmaller\blacksquare}}
+
+\def\qed@both@cmd#1#2{\begin{tikzpicture}[baseline=#2]
+    \draw (0,0) [fill=qed@gray] rectangle (#1,#1);
+\end{tikzpicture}}
+\def\qed@both{\qed@both@cmd{0.6em}{0.2ex}}
+\def\qed@both@small{\qed@both@cmd{1ex}{0ex}}
+
+\def\showAllQED{
+    \qed@open ~ \qed@open@small \\
+    \qed@fill ~ \qed@fill@small \\
+    \qed@gray ~ \qed@gray@small \\
+    \qed@both ~ \qed@both@small
+}
+
+%% escoha do QED %%
+\renewcommand{\qedsymbol}{\qed@fill@small}
+
+% marcadores de prova
+\newcommand{\direto}[1][~]{\ensuremath{(\rightarrow)}#1}
+\newcommand{\inverso}[1][~]{\ensuremath{(\leftarrow)}#1}
+
+% fontes
+% conjunto potencia
+\DeclareSymbolFont{boondox}{U}{BOONDOX-cal}{m}{n}
+\DeclareMathSymbol{\pow}{\mathalpha}{boondox}{"50}
+
+% somatorio
+\DeclareSymbolFont{matext}{OMX}{cmex}{m}{n}
+\DeclareMathSymbol{\sum@d}{\mathop}{matext}{"58}
+\DeclareMathSymbol{\sum@t}{\mathop}{matext}{"50}
+\undef\sum
+\DeclareMathOperator*{\sum}{\mathchoice{\sum@d}{\sum@t}{\sum@t}{\sum@t}}
+\DeclareMathOperator*{\bigsum}{\mathlarger{\mathlarger{\sum@d}}}
+
+% phi computer modern
+\DeclareMathAlphabet{\gk@mf}{OT1}{cmr}{m}{n}
+\let\old@Phi\Phi
+\def\Phi{\gk@mf{\old@Phi}}
+
+% união elem por elem
+\DeclareMathOperator{\wcup}{\mathaccent\cdot\cup}
+
+% familia de conjuntos
+\undef\fam
+\DeclareMathAlphabet{\fam}{OMS}{cmsy}{m}{n}
+
+% alguns símbolos
+\undef\natural
+\DeclareMathOperator{\real}{\mathbb{R}}
+\DeclareMathOperator{\natural}{\mathbb{N}}
+\DeclareMathOperator{\integer}{\mathbb{Z}}
+\DeclareMathOperator{\complex}{\mathbb{C}}
+\DeclareMathOperator{\rational}{\mathbb{Q}}
+\def\symdif{\mathrel{\triangle}}
+\def\midd{\;\middle|\;}
+% \def\pow{\mathcal{P}}
+
+% operações com mais espaçamento
+\def\cupp{\mathbin{\,\cup\,}}
+\def\capp{\mathbin{\,\cap\,}}
+
+% alguns operadores
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator{\Img}{Im}
+
+% marcadores de operadores
+\def\inv{^{-1}}
+\def\rel#1{\use@invr{\!\mathrel{#1}\!}}
+\def\nrel#1{\use@invr{\!\centernot{#1}\!}}
+\def\dmod#1{\ (\mathrm{mod}\ #1)}
+\def\cgc#1{{\textnormal{[}#1\textnormal{]}}}
+\def\cgp#1{{\textnormal{(}#1\textnormal{)}}}
+
+% marcador com inverso reduzido
+\def\use@invr#1{%
+    \begingroup%
+        \edef\inv{\inv\!}%
+        #1%
+    \endgroup%
+}
+
+% delimiters
+\def\abs#1{{\lvert\,#1\,\rvert}}
+% \DeclarePairedDelimiter{\abs}{\lvert}{\:\rvert}
+
+\makeatother
