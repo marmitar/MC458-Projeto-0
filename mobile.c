@@ -261,7 +261,7 @@ static
 equilibrio_t mobile_estavel(const mobile_t *mob)
 attribute((pure, nonnull));
 
-static attribute((pure, nonnull))
+static attribute((pure))
 /**
  * Teste se um objeto (peso ou submóbile)
  * é estável. Retorna também a massa
