@@ -60,7 +60,7 @@ mobile_t *mobile_filho(objeto_t obj) {
 	}
 }
 
-attribute(nonnull)
+static attribute(nonnull)
 /*  Desaloca toda a memória utilizada por um
  * móbile e seus possíveis submóbiles.
  */
@@ -95,7 +95,7 @@ objeto_t objeto_nao_inicializado(void) {
 	};
 }
 
-attribute(const)
+static attribute(const)
 /*  Cria um móbile não inicializado, seguro
  * para uso com a `free_mobile`.
  */
@@ -119,7 +119,7 @@ mobile_t mobile_nao_inicializado(void) {
 // Erro especial para entradas inválidas.
 #define ENTINV 0x1234
 
-attribute(format(scanf, 2, 3), nonnull)
+static attribute(format(scanf, 2, 3), nonnull)
 /* Checked `scanf`.
  *
  * Checa se o `scanf` fez todas as leituras esperadas,
@@ -152,9 +152,9 @@ int cscanf(unsigned expect, const char *restrict fmt, ...) {
 // para a leitura.
 #define SUBMOBILE 	0ULL
 
-mobile_t *ler_mobile(void);
+static mobile_t *ler_mobile(void);
 
-attribute(nonnull)
+static attribute(nonnull)
 /*  Monta um objeto de um móbile dado o
  * peso lido.
  *
@@ -185,6 +185,7 @@ int ler_filho(objeto_t *obj, size_t peso) {
 	}
 }
 
+static
 /*  Alocação e leitura de um móbile da
  * entrada padrão.
  *
@@ -245,10 +246,11 @@ typedef struct equilibrio {
 } equilibrio_t;
 
 
+static
 equilibrio_t mobile_estavel(const mobile_t *mob)
 attribute(pure, nonnull);
 
-attribute(pure, nonnull)
+static attribute(pure, nonnull)
 /* Teste se um objeto (peso ou submóbile)
  * é estável. Retorna também a massa
  * total do objeto.
@@ -269,7 +271,7 @@ equilibrio_t objeto_estavel(const objeto_t objeto) {
 	}
 }
 
-attribute(pure, nonnull)
+static attribute(pure, nonnull)
 /* Teste se um mébile é estável.
  * Retorna também a massa total
  * compreendida no móbile.
@@ -296,7 +298,7 @@ equilibrio_t mobile_estavel(const mobile_t *mob) {
 /* * * * * */
 /* SAÍDAS  */
 
-attribute(nonnull)
+static attribute(nonnull)
 // Apresenta o erro marcado em `errno` na saída de erro.
 void show_error(const char *prog) {
 	// erro especial nesse programa
@@ -308,6 +310,7 @@ void show_error(const char *prog) {
 	}
 }
 
+static
 /**
  * Imprime "S" se emBalanco for maior que 0, e "N" caso contrario.
  */
