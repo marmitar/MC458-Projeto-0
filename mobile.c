@@ -131,10 +131,11 @@ static attribute(format(scanf, 2, 3), nonnull)
 int cscanf(unsigned expect, const char *restrict fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-
 	// usa `vscanf` para tratar argumentos variados
 	// com mais facilidade
 	int rv = vscanf(fmt, args);
+	va_end(args);
+
 	// erro de leitura
 	if (rv < 0) {
 		return rv;
