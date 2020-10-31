@@ -267,7 +267,7 @@ typedef struct resultado {
 
 
 static
-resultado_t teste_mobile(const mobile_t *mob)
+resultado_t teste_mobile(const mobile_t mob)
 attribute((pure, nonnull));
 
 static attribute((pure))
@@ -281,7 +281,7 @@ resultado_t teste_objeto(const objeto_t objeto) {
 	/* se for um móbile, basta
 	fazer o teste recursivo */
 	if (mob != NULL) {
-		return teste_mobile(mob);
+		return teste_mobile(*mob);
 	/* senão, é apenas um peso simples
 	considerado estável */
 	} else {
@@ -292,21 +292,21 @@ resultado_t teste_objeto(const objeto_t objeto) {
 	}
 }
 
-static attribute((pure, nonnull))
+static attribute((pure))
 /**
  * Teste se um móbile está em equilíbrio.
  * Retorna também a massa total presa
  * no móbile.
  */
-resultado_t teste_mobile(const mobile_t *mob) {
+resultado_t teste_mobile(const mobile_t mob) {
 	bool estavel;
 	/* testes dos objetos esquerdo e direito */
 	resultado_t esq, dir, total;
-	esq = teste_objeto(mob->Pe);
-	dir = teste_objeto(mob->Pd);
+	esq = teste_objeto(mob.Pe);
+	dir = teste_objeto(mob.Pd);
 
 	/* estabilidade geral do móbile */
-	estavel = (esq.peso * mob->De == dir.peso * mob->Dd);
+	estavel = (esq.peso * mob.De == dir.peso * mob.Dd);
 
 	/* peso toal, considerando os dois objetos */
 	total.peso = esq.peso + dir.peso;
@@ -322,7 +322,7 @@ static attribute((pure, nonnull))
  * Teste se um móbile está em equilíbrio.
  */
 bool mobile_em_equilibrio(const mobile_t *mob) {
-	return teste_mobile(mob).equilibrio;
+	return teste_mobile(*mob).equilibrio;
 }
 
 
