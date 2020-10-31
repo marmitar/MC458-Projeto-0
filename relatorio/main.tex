@@ -7,8 +7,8 @@
 
 \usepackage{float, pgf, caption, subcaption}
 
-\input{secoes}
-\input{teorema}
+% \input{secoes}
+% \input{teorema}
 \input{simbolos}
 
 % math display skip
@@ -28,6 +28,9 @@
 
 \usepackage{xparse}
 
+\newtheorem*{hypothesis}{Hipótese}
+\newtheorem*{hypothesisf}{Hipótese Fortalecida}
+
 \NewDocumentCommand{\seq}{ s m O{n} O{\in\natural} }
     {\IfBooleanTF{#1}
         {\ensuremath{\left({#2}_{#3}\right)}}
@@ -39,6 +42,59 @@
 \date{}
 
 \begin{document}
-    \maketitle
+\maketitle
+
+\section{Implementação}
+
+    O algoritmo de cálculo de estabilidade foi feito considerando o móbile como uma árvore especializada. No caso, cada móbile tem dois objetos $O_e$ e $O_d$, com distâncias $D_e$ e $D_d$ do sustentáculo. Cada objeto $O$ pode ser um outro móbile ou um peso simples, sendo o peso $P_O$ conhecido apenas de objetos simples. Dessa forma, um móbile $M$ funciona como uma árvore não-vazia, sendo cada submódule um nó interno da árvore e objetos simples são as suas folhas.
+
+    Assim, cada peso simples $S$ tem uma medida de peso $P_S$ fixa, recebida da entrada padrão. Os móbiles $M$, no entanto, têm peso dependente de seus objetos $E$ e $D$. Então, podemos definir a função peso $P: \text{Objeto} \to \real$, que calcula o peso total de um objeto $O$, como:
+    \[
+        P(O) = \begin{cases}
+            P_O & \text{se $O$ é um peso simples} \\
+            P(E) + P(D) & \text{se $O$ é um móbile com objetos $E$ e $D$}
+        \end{cases}
+    \]
+
+    Com isso, um móbile $M$ com objetos $E$ e $D$, de pesos $P_E$ e $P_D$ e às distâncias $D_E$ e $D_D$, está em equilíbrio se seus submóbiles estão em equilíbrio e se $P_E \cdot D_E = P_D \cdot D_D$. Expandindo para objetos em geral, podemos tratar um peso simples como sempre em equilíbrio, de forma que $M$ estará em equilíbrio se e somente se $E$ está em equilíbrio, $D$ está em equilíbrio e $P(E) \cdot D_E = P(D) \cdot D_D$.
+
+\section{Algoritmo}
+
+    O algoritmo pode ser deduzido a partir de uma indução forte, como comumente acontece para árvores binárias. Nesse caso, a primeira hipótese de indução seria:
+
+    \begin{hypothesis}
+        Dado um móbile com $n$ objetos, conseguimos vericar se ele está em equilíbrio.
+    \end{hypothesis}
+
+    No entanto, esse tratamento funciona para objetos com peso definidos ou já conhecidos. Então, podemos fortalecer a hipótese com o cálculo da função peso $P$ definida anteriormente. Além disso, podemos usar a definição de equilíbrio que abrange os dois tipos de objetos, não só móbiles, fazendo uma hipótese que encobre os dois casos.
+
+    \begin{hypothesisf}
+        Dado um objeto $O$ com $n$ subobjetos, podemos calcular seu peso $P(O)$ e vericar se ele está em equilíbrio.
+    \end{hypothesisf}
+
+\section{Alg}
+
+    \begin{proof}
+        Suponha um inteiro $n \geq 1$ tal que para todo objeto $O$ composto de $1 \leq k < n$ massas podemos descobrir seu peso total $P(O)$ e se ele está em equilíbrio. Suponha ainda um objeto $O$ com $n$ subobjetos.
+
+        ~
+
+        Caso 1: $O$ é um peso simples, ou seja, $n = 1$. Logo, o peso de é conhecido, então seja $P_O$ esse peso. Portanto, $P(O) = P_O$ e, por definição, $O$ está em equilíbrio.
+
+        ~
+
+        Caso 2: $O$ é um móbile. Seja $E$ o objeto peso na ponta esquerda de $O$, à uma distância $D_E$ do sustentáculo, e $D$ o objeto na direita, com distância $D_D$.
+
+        Note que $D$ deve ter pelo $k_D \geq 1$ massas, que é no caso em que $D$ é um peso simples. Portanto, $E$ terá $1 \leq k_E = n - k_D \leq n - 1 < n$ massas. Logo, pela hipótese indutiva, podemos calcular $P(E)$ e sabemos se $E$ está em equilíbrio. Da mesma forma, $1 \leq k_D < n$. Então, podemos conseguir $P(D)$ e saber se $D$ está em equilíbrio.
+
+        Assim, se $E$ e $D$ estão em equilíbrio e $P(E) * D_E = P(D) * D_D$, então $O$ também está em equilíbrio. Caso alguma dessas condições não seja atendida, $O$ não está em equilíbrio. Portanto, teremos que $P(O) = P(E) + P(D)$ e podemos dizer se $O$ está em equilíbrio.
+    \end{proof}
+
+
+    % \begin{proof}
+    %     Suponha um inteiro $n \geq 2$ tal que para todo mobile $M$ composto de $2 \leq k < n$ pesos simples podemos descobrir seu peso $P(M)$ e se ele está em equilíbrio. Suponha ainda um móbile $M$ com $n$ pesos.
+
+    %     Caso 1: $M$ é um móbilo simples. Logo, temos dois pesos simples $e$ e $d$, com pesos $P_e$ e $P_d$ e
+    % \end{proof}
 
 \end{document}
