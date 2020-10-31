@@ -7,7 +7,14 @@
 
 
 /* Atributos para GCC. */
-#define attribute __attribute__
+#ifdef __GNUC__
+#define attribute(attrs)	\
+	__attribute__(attrs)
+#else
+/* não faz nada em outros compiladores */
+#define attribute(attrs)
+#endif
+
 /* Ponteiro restrito (C99). */
 #define restrict __restrict__
 
@@ -26,13 +33,13 @@ typedef struct mobile mobile_t;
 typedef struct objeto {
 	/* O objeto propriamente. */
 	union dado {
-		/* Peso simples. */
+		/* Que pode ser um peso simples */
 		size_t peso;
-		/* Um submóbile. */
-		mobile_t *filho;
+		/* ou um móbile */
+		mobile_t *mobile;
 	} dado;
 	/* Tipo do objeto: peso simples ou submóbile. */
-	enum tipo { PESO, FILHO } tipo;
+	enum tipo { PESO, MOBILE } tipo;
 } objeto_t;
 
 
@@ -50,14 +57,13 @@ struct mobile {
 
 attribute((const))
 /**
- * Ponteiro para o móbile em um objeto de
- * outro móbile.
- *
- * Retorna NULL se o objeto for um peso simples.
+ * Retorna o ponteiro para o móbile a partir
+ * de um objeto. Retorna NULL se o objeto
+ * não for um móbile.
  */
-mobile_t *mobile_filho(objeto_t obj) {
-	if (obj.tipo == FILHO) {
-		return obj.dado.filho;
+mobile_t *acessa_mobile(objeto_t obj) {
+	if (obj.tipo == MOBILE) {
+		return obj.dado.mobile;
 	} else {
 		return NULL;
 	}
@@ -73,12 +79,12 @@ void free_mobile(mobile_t *mob) {
 	int error = errno;
 
 	/* desaloca filho esquerdo */
-	mobile_t *filho = mobile_filho(mob->Pe);
+	mobile_t *filho = acessa_mobile(mob->Pe);
 	if (filho != NULL) {
 		free_mobile(filho);
 	}
 	/* e o filho direito */
-	filho = mobile_filho(mob->Pd);
+	filho = acessa_mobile(mob->Pd);
 	if (filho != NULL) {
 		free_mobile(filho);
 	}
@@ -160,39 +166,10 @@ int cscanf(unsigned expect, const char *restrict fmt, ...) {
 /* Marcador de objeto como submóbile, para a leitura. */
 #define SUBMOBILE 	0UL
 
-static mobile_t *ler_mobile(void);
 
-static attribute((nonnull))
-/**
- * Monta um objeto de um móbile dado o
- * peso lido.
- *
- * Caso necessário, faz a laitura de um
- * submóbile.
- *
- * Retorna `OK` em caso de sucesso. Para erros,
- * o valor do erro é marcado em `errno` e
- * nada é escrito em `obj`.
- */
-int ler_filho(objeto_t *obj, size_t peso) {
-	/* leitura de submóbile necessária */
-	if (peso == SUBMOBILE) {
-		mobile_t *filho = ler_mobile();
-		if (filho == NULL) {
-			return ERR;
-		}
-		obj->dado.filho = filho;
-		obj->tipo = FILHO;
-
-		return OK;
-	/* objeto é um peso simples */
-	} else {
-		obj->dado.peso = peso;
-		obj->tipo = PESO;
-
-		return OK;
-	}
-}
+static
+int monta_objeto(objeto_t *obj, size_t peso)
+attribute((nonnull));
 
 static
 /*  Alocação e leitura de um móbile da
@@ -223,20 +200,52 @@ mobile_t *ler_mobile(void) {
 	mob->Dd = Dd;
 
 	/* leitura do filho esquerdo */
-	rv = ler_filho(&mob->Pe, Pe);
+	rv = monta_objeto(&mob->Pe, Pe);
 	if (rv != OK) {
 		/* desaloca antes de retornar erro */
 		free_mobile(mob);
 		return NULL;
 	}
 	/* e do filho direito */
-	rv = ler_filho(&mob->Pd, Pd);
+	rv = monta_objeto(&mob->Pd, Pd);
 	if (rv != OK) {
 		free_mobile(mob);
 		return NULL;
 	}
-	/* objeto alocado e inicializado (lido) */
+	/* mobile alocado e inicializado (lido) */
 	return mob;
+}
+
+static attribute((nonnull))
+/**
+ * Monta um objeto de um móbile dado o
+ * peso lido.
+ *
+ * Caso necessário, faz a leitura de um
+ * submóbile.
+ *
+ * Retorna `OK` em caso de sucesso. Para erros,
+ * o valor do erro é marcado em `errno` e
+ * nada é escrito em `obj`.
+ */
+int monta_objeto(objeto_t *obj, size_t peso) {
+	/* leitura de submóbile necessária */
+	if (peso == SUBMOBILE) {
+		mobile_t *filho = ler_mobile();
+		if (filho == NULL) {
+			return ERR;
+		}
+		obj->dado.mobile = filho;
+		obj->tipo = MOBILE;
+
+		return OK;
+	/* objeto é um peso simples */
+	} else {
+		obj->dado.peso = peso;
+		obj->tipo = PESO;
+
+		return OK;
+	}
 }
 
 
@@ -245,56 +254,56 @@ mobile_t *ler_mobile(void) {
 
 /**
  * Resultado do teste de equilíbrio
- * de um móbile.
+ * de um objeto.
  */
-typedef struct equilibrio {
+typedef struct resultado {
 	/* Peso total do móbile
 	e seus objetos. */
 	size_t peso;
 	/* Se o móbile e submóbiles
 	estão em equilíbrio. */
 	bool equilibrio;
-} equilibrio_t;
+} resultado_t;
 
 
 static
-equilibrio_t mobile_estavel(const mobile_t *mob)
+resultado_t teste_mobile(const mobile_t *mob)
 attribute((pure, nonnull));
 
 static attribute((pure))
 /**
- * Teste se um objeto (peso ou submóbile)
- * é estável. Retorna também a massa
- * total do objeto.
+ * Teste se um objeto (peso ou móbile)
+ * está em equilíbrio. Retorna também
+ * a massa total do objeto.
  */
-equilibrio_t objeto_estavel(const objeto_t objeto) {
-	mobile_t *filho = mobile_filho(objeto);
-	/* se for um filho, basta
-	fazer o teste de móbile */
-	if (filho != NULL) {
-		return mobile_estavel(filho);
+resultado_t teste_objeto(const objeto_t objeto) {
+	mobile_t *mob = acessa_mobile(objeto);
+	/* se for um móbile, basta
+	fazer o teste recursivo */
+	if (mob != NULL) {
+		return teste_mobile(mob);
 	/* senão, é apenas um peso simples
 	considerado estável */
 	} else {
-		equilibrio_t eq;
-		eq.peso = objeto.dado.peso;
-		eq.equilibrio = true;
-		return eq;
+		resultado_t res;
+		res.peso = objeto.dado.peso;
+		res.equilibrio = true;
+		return res;
 	}
 }
 
 static attribute((pure, nonnull))
 /**
- * Teste se um mébile é estável.
- * Retorna também a massa total
- * compreendida no móbile.
+ * Teste se um móbile está em equilíbrio.
+ * Retorna também a massa total presa
+ * no móbile.
  */
-equilibrio_t mobile_estavel(const mobile_t *mob) {
+resultado_t teste_mobile(const mobile_t *mob) {
 	bool estavel;
 	/* testes dos objetos esquerdo e direito */
-	equilibrio_t esq, dir, total;
-	esq = objeto_estavel(mob->Pe);
-	dir = objeto_estavel(mob->Pd);
+	resultado_t esq, dir, total;
+	esq = teste_objeto(mob->Pe);
+	dir = teste_objeto(mob->Pd);
 
 	/* estabilidade geral do móbile */
 	estavel = (esq.peso * mob->De == dir.peso * mob->Dd);
@@ -308,6 +317,14 @@ equilibrio_t mobile_estavel(const mobile_t *mob) {
 	return total;
 }
 
+static attribute((pure, nonnull))
+/**
+ * Teste se um móbile está em equilíbrio.
+ */
+bool mobile_em_equilibrio(const mobile_t *mob) {
+	return teste_mobile(mob).equilibrio;
+}
+
 
 /* * * * * */
 /* SAÍDAS  */
@@ -316,7 +333,7 @@ static attribute((nonnull))
 /**
  * Apresenta o erro marcado em `errno` na saída de erro.
  */
-void show_error(const char *prog) {
+void printerr(const char *prog) {
 	/* erro especial nesse programa */
 	if (errno == ENTINV) {
 		(void) fprintf(stderr, "%s: entrada inválida\n", prog);
@@ -330,7 +347,7 @@ static
 /**
  * Imprime "S" se emBalanco for maior que 0, e "N" caso contrario.
  */
-void imprimeSaida(bool emBalanco) {
+void imprime_saida(bool emBalanco) {
 	(void) printf("%s\n", (emBalanco ? "S" : "N"));
 }
 
@@ -342,7 +359,7 @@ int main(int argc, const char *argv[]) {
 	size_t _len;
 	const char *prog;
 	mobile_t *mobile;
-	equilibrio_t resultado;
+	bool equilibrio;
 
 	/* nome do programa, para saída de erro */
 	assert(argc > 0);
@@ -351,20 +368,20 @@ int main(int argc, const char *argv[]) {
 	/* leitura da quantidade de linhas
 	(ignorada no decorrer do programa) */
 	if (cscanf(1, "%lu\n", &_len) != OK) {
-		show_error(prog);
+		printerr(prog);
 		return EXIT_FAILURE;
 	}
 
 	/* leitura do mobile */
 	mobile = ler_mobile();
 	if (mobile == NULL) {
-		show_error(prog);
+		printerr(prog);
 		return EXIT_FAILURE;
 	}
 	/* teste de estabilidade dele */
-	resultado = mobile_estavel(mobile);
+	equilibrio = mobile_em_equilibrio(mobile);
 	/* e apresentação do resultado */
-	imprimeSaida(resultado.equilibrio);
+	imprime_saida(equilibrio);
 
 	/* encerramento do programa */
 	free_mobile(mobile);
