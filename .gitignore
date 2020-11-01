@@ -8,3 +8,5 @@ main.fls
 main.out
 main.log
 main.synctex.gz
+_minted*/
+old.tex
