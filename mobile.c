@@ -348,7 +348,7 @@ static
  * Imprime "S" se emBalanco for maior que 0, e "N" caso contrario.
  */
 void imprime_saida(bool emBalanco) {
-	(void) printf("%s\n", (emBalanco ? "S" : "N"));
+	(void) printf("%c\n", (emBalanco ? 'S' : 'N'));
 }
 
 
