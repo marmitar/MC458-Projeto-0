@@ -83,10 +83,14 @@
 \newlist{ncasos}{description}{2}
 \setlist[ncasos]{wide,listparindent={\parindent},parsep={\parskip},topsep={\parskip}}
 
+\usepackage{fancyhdr}
+\pagestyle{empty}
+
 % \usepackage{showframe}
 \begin{document}
 
     \maketitle
+    \thispagestyle{empty}
 
     \input{texto}
 
