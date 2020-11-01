@@ -1,6 +1,6 @@
 \section{Definições}
 
-    Um móbile $M$, com objetos $E$ e $D$ presos na barra, está em equilíbrio se $P_e \cdot D_e = P_d \cdot D_d$ e todos os seus submóbiles também estão em equilíbrio, sendo que cada objeto $E$ ou $D$ pode ser um submóbile ou um peso simples. No entanto, essa definição só faz sentido para móbiles, mas ela pode ser expandida para pesos simples, considerando esse tipo de objeto como sempre em equilíbrio.
+    Um móbile $M$, com objetos $E$ e $D$ presos na barra, é dito em equilíbrio se $P_e \cdot D_e = P_d \cdot D_d$ e todos os seus submóbiles também estão em equilíbrio, sendo que cada objeto $E$ ou $D$ pode ser um submóbile ou um peso simples. No entanto, essa definição só faz sentido para móbiles, mas ela pode ser expandida para pesos simples, considerando esse último tipo de objeto como sempre em equilíbrio.
 
     Com isso, podemos definir equilíbrio de forma recursiva, mas equivalente, considerando os dois tipos de objetos (móbiles ou pesos simples):
 
@@ -24,13 +24,13 @@
 
 \section{Implementação}
 
-    Podemos descrever os tipos implementados em uma forma mais abstrata como:
+    Os tipos usados na implementação podem ser definido de forma mais abstrata como:
     \vskip-.9em
     \noindent%
     \begin{minipage}{0.48\textwidth}
         \noindent\begin{minted}{haskell}
             struct Mobile {
-                E, D    :: Objeto,
+                E, D    :: Objeto
                 De, Dd  :: Natural
             }
         \end{minted}
@@ -43,22 +43,22 @@
         \end{minted}
     \end{minipage}
 
-    Podemos ver que um móbile $M$ funciona como uma árvore binária especializada, onde cada submóbile é um nó interno (com exatamente dois filhos) e cada pesos simples é uma folha. Então, a entrada foi lida em uma árvore de objetos, sendo que os pesos simples foram tratados apenas com um inteiro, o seu peso fixo $P_O$.
+    Podemos ver que um móbile $M$ funciona como uma árvore binária especializada, onde cada submóbile é um nó interno (com exatamente dois filhos) e cada pesos simples é uma folha. Então, a entrada foi lida em uma árvore de objetos, sendo que os pesos simples foram tratados apenas como um inteiro, o seu peso fixo $P_O$.
 
 \section{Algoritmo}
 
     O algoritmo para descobrir se um móbile está em equilíbrio pode ser deduzido a partir de uma indução forte, como é comum para árvores binárias. No entanto, precisamos também dos pesos dos os objetos presos no móbile.
 
-    Então, podemos fortalecer a hipótese com o cálculo da função peso. Além disso, podemos usar a definição recursiva de equilíbrio, expandindo a hipótese para objetos em geral.
+    Então, podemos fortalecer a hipótese com o cálculo da função $P$. Além disso, podemos usar a definição recursiva de equilíbrio, expandindo a hipótese para objetos em geral.
 
     \begin{hypothesisf}
-        Dado um objeto $O$ com $n$ massas simples, podemos calcular seu peso $P(O)$ e vericar se ele está em equilíbrio.
+        Dado um objeto $O$ com $n$ massas simples, podemos calcular seu peso total $P(O)$ e vericar se ele está em equilíbrio.
     \end{hypothesisf}
 
     Note que a indução é em $n$, o número de massas no objeto. Como apenas pesos simples têm massa considerável, $n$ também é o número de pesos simples compreendido no objeto, ou também o número de folhas na árvore.
 
     \begin{proof}[\textbf{Demonstração}] \label[proof]{proof:alg}
-        Suponha um inteiro $n \geq 1$ tal que para todo objeto $O$ composto de $1 \leq k < n$ massas podemos descobrir seu peso total $P(O)$ e se ele está em equilíbrio. Suponha ainda um objeto $O$ com $n$ massas.
+        Suponha um inteiro $n \geq 1$ tal que para todo objeto $S$ composto de $1 \leq k < n$ massas podemos descobrir seu peso total $P(S)$ e se $S$ está em equilíbrio. Suponha ainda um objeto $O$ com $n$ massas.
 
         ~
 
@@ -83,7 +83,7 @@
 
 \section{Complexidade}
 
-    Podemos ver pelo algoritmo que a etapa de divisão, em uma estrutura de árvore, segue trivialmente, com tempo constante $t_1$. A etapa de combinação também é uma constante $t_2$, fazendo apenas multiplicações, adições e operações lógicas. A única etapa com tempo dependente da entrada, neste algoritmo, é a conquista, implementada recursivamente.
+    Podemos ver pelo algoritmo que a etapa de divisão, em uma estrutura de árvore, segue trivialmente, com tempo constante $t_1$. A etapa de combinação também tem tempo constante $t_2$, fazendo apenas operações lógicas e aritmética independentes da entrada. A única etapa com tempo dependente da entrada, neste algoritmo, é a conquista, implementada recursivamente.
 
     Assim, teremos que tempo de execução para um objeto $O$ será:
     \vskip-.5em\[
@@ -103,15 +103,18 @@
     Podemos ver que o cálculo dos pesos depende de todas as $n$ massas, então vale supor que o algoritmo é da classe $\Theta(n)$. Vamos provar então a fórmula fechada $T(n) = c n + b$ por indução forte em $n$.
 
     \begin{proof}[\textbf{Demonstração}]
-        Considere as constantes $c = t_1 + t_2$ e $b = - t_2$ e suponha que $T(k) = c k + b$ para todo $1 \leq k < n$.
+        Considere as constantes $c = t_1 + t_2$ e $b = - t_2$.
 
         \begin{ncasos}
-            \item[Caso base:] $n = 1$. Logo, $T(1) = c + b = t_1 + t_2 - t_2 = t_1$, como esperado.
+            \item[Caso base:] Seja $n = 1$. Logo, $T(1) = c + b = t_1 + t_2 - t_2 = t_1$, como esperado.
 
-            \item[Passo indutivo:] Suponha que $n \geq 2$. Logo, o objeto deve ser um móbile, com filhos $E$ e $D$, com $n_e$ e $n_d$ massas simples. Como o móbile não têm massa própria, então $n_e + n_d = n$. Além disso, $1 \leq n_e < n$ e $1 \leq n_d < n$, então podemos aplicar a hipótese indutiva:
+            \item[Hipótese indutiva:] Suponha que $T(k) = c k + b$ para todo $1 \leq k < n$ e algum $n \geq 2$.
+
+            \item[Passo indutivo:] Seja $n \geq 2$. Logo, o objeto deve ser um móbile, com filhos $E$ e $D$, compostos de $n_e$ e $n_d$ massas simples. Como o móbile não têm massa própria, então $n_e + n_d = n$. Além disso, $1 \leq n_e < n$ e $1 \leq n_d < n$, então podemos aplicar a hipótese indutiva:
             \begin{align*}
                 T(n) &= T(n_e) + T(n_d) + t_2 \\
-                    &= c n_e + b + c n_d + b + t_2 = c (n_e + n_d) + b + (b + t_2) \\
+                    &= c n_e + b + c n_d + b + t_2 \\
+                    &= c (n_e + n_d) + b + (b + t_2) \\
                     &= c n + b
             \end{align*}
         \end{ncasos}
