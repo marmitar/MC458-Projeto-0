@@ -1,0 +1,121 @@
+\section{Definições}
+
+    Um móbile $M$, com objetos $E$ e $D$ presos na barra, está em equilíbrio se $P_e \cdot D_e = P_d \cdot D_d$ e todos os seus submóbiles também estão em equilíbrio, sendo que cada objeto $E$ ou $D$ pode ser um submóbile ou um peso simples. No entanto, essa definição só faz sentido para móbiles, mas ela pode ser expandida para pesos simples, considerando esse tipo de objeto como sempre em equilíbrio.
+
+    Com isso, podemos definir equilíbrio de forma recursiva, mas equivalente, considerando os dois tipos de objetos (móbiles ou pesos simples):
+
+    \begin{definition}[Equilíbrio]\label{def:equil}
+        Dizemos que um objeto $O$ está em equilíbrio se uma destas condições for atendida:
+
+        \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=0ex,parsep=1ex,leftmargin=1.8em,label=\emph{\roman*}\,)]
+            \item $O$ é um pesos simples.
+            \item $O$ é um móbile com os objetos $E$ e $D$ presos, tal que $E$ e $D$ estão em equilíbrio e $P_e \cdot D_e = P_d \cdot D_d$.
+        \end{enumerate}
+    \end{definition}
+
+    Essa definição requer que o peso total $P_O$ de um objeto $O$ seja conhecido, o que é verdade apenas para pesos simples. Para suprir todos os casos podemos definir uma função $P: \text{Objeto} \to \natural$ que calcula o peso total de um objeto.
+    \vskip-.5em
+    \begin{equation*}
+        P(O) = \begin{cases}
+            P_O & \text{se $O$ é um peso simples} \\
+            P(E) + P(D) & \text{se $O$ é um móbile com objetos $E$ e $D$}
+        \end{cases} \label{eq:peso}
+    \end{equation*}
+
+\section{Implementação}
+
+    Podemos descrever os tipos implementados em uma forma mais abstrata como:
+    \vskip-.9em
+    \noindent%
+    \begin{minipage}{0.48\textwidth}
+        \noindent\begin{minted}{haskell}
+            struct Mobile {
+                E, D    :: Objeto,
+                De, Dd  :: Natural
+            }
+        \end{minted}
+    \end{minipage}\hfill%
+    \begin{minipage}{0.48\textwidth}
+        \noindent\begin{minted}{haskell}
+            tipo Peso = Natural
+
+            tipo Objeto = Peso | Mobile
+        \end{minted}
+    \end{minipage}
+
+    Podemos ver que um móbile $M$ funciona como uma árvore binária especializada, onde cada submóbile é um nó interno (com exatamente dois filhos) e cada pesos simples é uma folha. Então, a entrada foi lida em uma árvore de objetos, sendo que os pesos simples foram tratados apenas com um inteiro, o seu peso fixo $P_O$.
+
+\section{Algoritmo}
+
+    O algoritmo para descobrir se um móbile está em equilíbrio pode ser deduzido a partir de uma indução forte, como é comum para árvores binárias. No entanto, precisamos também dos pesos dos os objetos presos no móbile.
+
+    Então, podemos fortalecer a hipótese com o cálculo da função peso. Além disso, podemos usar a definição recursiva de equilíbrio, expandindo a hipótese para objetos em geral.
+
+    \begin{hypothesisf}
+        Dado um objeto $O$ com $n$ massas simples, podemos calcular seu peso $P(O)$ e vericar se ele está em equilíbrio.
+    \end{hypothesisf}
+
+    Note que a indução é em $n$, o número de massas no objeto. Como apenas pesos simples têm massa considerável, $n$ também é o número de pesos simples compreendido no objeto, ou também o número de folhas na árvore.
+
+    \begin{proof}[\textbf{Demonstração}] \label[proof]{proof:alg}
+        Suponha um inteiro $n \geq 1$ tal que para todo objeto $O$ composto de $1 \leq k < n$ massas podemos descobrir seu peso total $P(O)$ e se ele está em equilíbrio. Suponha ainda um objeto $O$ com $n$ massas.
+
+        ~
+
+        \begin{casos}
+            \item $O$ é um peso simples, ou seja, $n = 1$. Logo, o peso dele é conhecido, então seja $P_O$ esse peso. Portanto, $P(O) = P_O$ e, por definição, $O$ está em equilíbrio.
+
+            \item $O$ é um móbile, então, $n \geq 2$. Seja $E$ o objeto peso na ponta esquerda de $O$, à uma distância $D_e$ do sustentáculo, e $D$ o objeto na direita, com distância $D_d$. Além disso, $E$ terá $n_e$ massas e $D$, $n_d$, sendo que $n_e + n_d = n$, já que a barra e a sustentação do móbile não têm peso.
+
+            Note que $D$ deve ter $n_d \geq 1$ massas, portanto, $E$ terá $1 \leq n_e = n - n_d \leq n - 1 < n$ massas. Logo, pela hipótese indutiva, podemos calcular $P(E)$ e sabemos se $E$ está em equilíbrio. Da mesma forma, $1 \leq n_d < n$. Então, podemos conseguir $P(D)$ e saber se $D$ está em equilíbrio.
+
+            Assim, se $E$ e $D$ estão em equilíbrio e $P(E) \cdot D_e = P(D) \cdot D_d$, então $O$ também está em equilíbrio. Caso alguma dessas condições não seja atendida, $O$ não está em equilíbrio. Portanto, teremos que $P(O) = P(E) + P(D)$ e podemos dizer se $O$ está em equilíbrio.
+        \end{casos}
+    \end{proof}
+
+    O algoritmo derivado da demonstração acima é um algoritmo de Divisão e Conquista, que pode ser explicitado nas seguintes etapas:
+
+    \begin{description}[topsep=.4em,itemsep=-.4em,partopsep=0ex,parsep=1ex]
+        \item[\textbf{Divisão:}] Separa um móbile em seus objetos, presos nas extremidades da barra.
+        \item[\textbf{Conquista:}] Descobre recursivamente o peso dos subojetos e se eles estão em equilíbrio.
+        \item[\textbf{Combinação:}] O peso total do móbile é a soma dos pesos dos objetos e ele estará em equilíbrio dependendo dos pesos e dos estados de equilíbrio dos objetos.
+    \end{description}\vskip.4em
+
+\section{Complexidade}
+
+    Podemos ver pelo algoritmo que a etapa de divisão, em uma estrutura de árvore, segue trivialmente, com tempo constante $t_1$. A etapa de combinação também é uma constante $t_2$, fazendo apenas multiplicações, adições e operações lógicas. A única etapa com tempo dependente da entrada, neste algoritmo, é a conquista, implementada recursivamente.
+
+    Assim, teremos que tempo de execução para um objeto $O$ será:
+    \vskip-.5em\[
+        T(O) = \begin{cases}
+            \quad t_1 & \text{se $O$ for um peso simples} \\
+            T(E) + T(D) + t_2 & \text{se $O$ for um móbile, sendo $E$ e $D$ seus objetos}
+        \end{cases}
+    \]
+    Agora, considerando o tamanho da entrada $n$ como a quantidade de massas distribuídas no objeto, teremos que um peso simples é apenas uma massa, ou seja, $n = 1$. Além disso, um móbile deve ter dois objetos $E$ e $D$ presos nele, comprendendo $n_E \geq 1$ e $n_D \geq 1$ massas, respectivamente, de modo que $n_E + n_D = n \geq 2$. Então:
+    \vskip-1em\[
+        T(n) = \begin{cases}
+            \quad t_1 & \text{se $n = 1$} \\
+            T(n_e) + T(n_d) + t_2 & \text{se $n \geq 2$}
+        \end{cases}
+    \]
+
+    Podemos ver que o cálculo dos pesos depende de todas as $n$ massas, então vale supor que o algoritmo é da classe $\Theta(n)$. Vamos provar então a fórmula fechada $T(n) = c n + b$ por indução forte em $n$.
+
+    \begin{proof}[\textbf{Demonstração}]
+        Considere as constantes $c = t_1 + t_2$ e $b = - t_2$ e suponha que $T(k) = c k + b$ para todo $1 \leq k < n$.
+
+        \begin{ncasos}
+            \item[Caso base:] $n = 1$. Logo, $T(1) = c + b = t_1 + t_2 - t_2 = t_1$, como esperado.
+
+            \item[Passo indutivo:] Suponha que $n \geq 2$. Logo, o objeto deve ser um móbile, com filhos $E$ e $D$, com $n_e$ e $n_d$ massas simples. Como o móbile não têm massa própria, então $n_e + n_d = n$. Além disso, $1 \leq n_e < n$ e $1 \leq n_d < n$, então podemos aplicar a hipótese indutiva:
+            \begin{align*}
+                T(n) &= T(n_e) + T(n_d) + t_2 \\
+                    &= c n_e + b + c n_d + b + t_2 = c (n_e + n_d) + b + (b + t_2) \\
+                    &= c n + b
+            \end{align*}
+        \end{ncasos}
+        \vskip-1em
+    \end{proof}
+
+    A partir da demonstração acima, podemos concluir que $T(n) \in \Theta(c n + b) = \Theta(n)$.
