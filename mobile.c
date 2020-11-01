@@ -46,7 +46,7 @@ typedef struct objeto {
 /* Implementação do móbile. */
 struct mobile {
 	/* Objeto em cada lado. */
-	objeto_t Pe, Pd;
+	objeto_t E, D;
 	/* Distância do objeto na haste. */
 	size_t De, Dd;
 };
@@ -79,12 +79,12 @@ void free_mobile(mobile_t *mob) {
 	int error = errno;
 
 	/* desaloca filho esquerdo */
-	mobile_t *filho = acessa_mobile(mob->Pe);
+	mobile_t *filho = acessa_mobile(mob->E);
 	if (filho != NULL) {
 		free_mobile(filho);
 	}
 	/* e o filho direito */
-	filho = acessa_mobile(mob->Pd);
+	filho = acessa_mobile(mob->D);
 	if (filho != NULL) {
 		free_mobile(filho);
 	}
@@ -113,8 +113,8 @@ static attribute((const))
  */
 mobile_t mobile_nao_inicializado(void) {
 	mobile_t mob;
-	mob.Pe = objeto_nao_inicializado();
-	mob.Pd = objeto_nao_inicializado();
+	mob.E = objeto_nao_inicializado();
+	mob.D = objeto_nao_inicializado();
 	mob.De = mob.Dd = 0;
 	return mob;
 }
@@ -200,14 +200,14 @@ mobile_t *ler_mobile(void) {
 	mob->Dd = Dd;
 
 	/* leitura do filho esquerdo */
-	rv = monta_objeto(&mob->Pe, Pe);
+	rv = monta_objeto(&mob->E, Pe);
 	if (rv != OK) {
 		/* desaloca antes de retornar erro */
 		free_mobile(mob);
 		return NULL;
 	}
 	/* e do filho direito */
-	rv = monta_objeto(&mob->Pd, Pd);
+	rv = monta_objeto(&mob->D, Pd);
 	if (rv != OK) {
 		free_mobile(mob);
 		return NULL;
@@ -302,8 +302,8 @@ resultado_t teste_mobile(const mobile_t mob) {
 	bool estavel;
 	/* testes dos objetos esquerdo e direito */
 	resultado_t esq, dir, total;
-	esq = teste_objeto(mob.Pe);
-	dir = teste_objeto(mob.Pd);
+	esq = teste_objeto(mob.E);
+	dir = teste_objeto(mob.D);
 
 	/* estabilidade geral do móbile */
 	estavel = (esq.peso * mob.De == dir.peso * mob.Dd);
@@ -333,7 +333,7 @@ static attribute((nonnull))
 /**
  * Apresenta o erro marcado em `errno` na saída de erro.
  */
-void printerr(const char *prog) {
+void imprime_erro(const char *prog) {
 	/* erro especial nesse programa */
 	if (errno == ENTINV) {
 		(void) fprintf(stderr, "%s: entrada inválida\n", prog);
@@ -368,14 +368,14 @@ int main(int argc, const char *argv[]) {
 	/* leitura da quantidade de linhas
 	(ignorada no decorrer do programa) */
 	if (cscanf(1, "%lu\n", &_len) != OK) {
-		printerr(prog);
+		imprime_erro(prog);
 		return EXIT_FAILURE;
 	}
 
 	/* leitura do mobile */
 	mobile = ler_mobile();
 	if (mobile == NULL) {
-		printerr(prog);
+		imprime_erro(prog);
 		return EXIT_FAILURE;
 	}
 	/* teste de estabilidade dele */
