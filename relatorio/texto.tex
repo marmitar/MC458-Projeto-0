@@ -83,7 +83,7 @@
 
 \section{Complexidade}
 
-    Podemos ver pelo algoritmo que a etapa de divisão, em uma estrutura de árvore, segue trivialmente, com tempo constante. A etapa de combinação também é constante, fazendo apenas operações lógicas e aritmética independentes da entrada. Podemos chamar de $t_2$ o tempo dessas duas etapas. A única etapa com tempo dependente da entrada, neste algoritmo, é a conquista, implementada recursivamente. Além disso, o teste para um peso simples tem tempo constante $t_1$.
+    Podemos ver pelo algoritmo que a etapa de divisão, em uma estrutura de árvore, segue trivialmente, com tempo constante. A etapa de combinação também é constante, fazendo apenas operações lógicas e aritmética independentes da entrada. Podemos chamar de $t_2 > 0$ o tempo dessas duas etapas. A única etapa com tempo dependente da entrada, neste algoritmo, é a conquista, implementada recursivamente. Além disso, o teste para um peso simples tem tempo constante $t_1 > 0$.
 
     Assim, teremos que tempo de execução para um objeto $O$ será:
     \vskip-.5em\[
@@ -121,4 +121,4 @@
         \vskip-1em
     \end{proof}
 
-    A partir da demonstração acima, podemos concluir que $T(n) \in \Theta(c n + b) = \Theta(n)$.
+    A partir da demonstração acima e como $c > 0$, podemos concluir que $T(n) \in \Theta(c n + b) = \Theta(n)$.
