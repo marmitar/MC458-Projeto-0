@@ -55,7 +55,7 @@ struct mobile {
 /* * * * * * * * * * *  * * * */
 /* TRATEMENTO DAS ESTRUTURAS  */
 
-attribute((const))
+static attribute((const))
 /**
  * Retorna o ponteiro para o móbile a partir
  * de um objeto. Retorna NULL se o objeto
@@ -94,7 +94,7 @@ void free_mobile(mobile_t *mob) {
 	errno = error;
 }
 
-attribute((const))
+static inline attribute((const))
 /**
  * Cria um objeto não inicializado, seguro
  * para uso com a `free_mobile`.
@@ -106,7 +106,7 @@ objeto_t objeto_nao_inicializado(void) {
 	return obj;
 }
 
-static attribute((const))
+static inline attribute((const))
 /**
  * Cria um móbile não inicializado, seguro
  * para uso com a `free_mobile`.
@@ -317,7 +317,7 @@ resultado_t teste_mobile(const mobile_t mob) {
 	return total;
 }
 
-static attribute((pure, nonnull))
+static inline attribute((pure, nonnull))
 /**
  * Teste se um móbile está em equilíbrio.
  */
